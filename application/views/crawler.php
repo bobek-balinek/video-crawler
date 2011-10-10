@@ -5,9 +5,9 @@
 
 <?php if(isset($logs) and $logs){ ?>
 <ul>
-	<?php foreach ( $logs as $row ) ?>
+	<?php foreach ( $logs as $row ){ ?>
 	<li><b><?=$row['item']?></b> / <b><?=$row['message']?></b>  </li>
-	<?php ?>
+	<?php } ?>
 </ul>
 <?php }else{ ?>
 

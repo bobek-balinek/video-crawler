@@ -14,16 +14,24 @@ class Crawler extends CI_Controller {
 	public function index(){
 	
 	$data = array();
+	$logs = array();
 	
+	
+		$logs[] = array('item'=>'Skrypt', 'message'=>'Uruchomiono skrypt');
 		$data['profiles'] = $this->profiles_model->get();
 		
-				foreach( $data['profiles'] as $profile_row ){
+			foreach( $data['profiles'] as $profile_row ){
+			
+				$logs[] = array('item' => 'Profil: '.$profile_row->name , 'message' => 'Otworzono profil');
 				
-					$data['urls'] = $this->urls_model->get_by_profile();
+				$this->urls_model->idProfiles = $profile_row->id;
+				$data['urls'] = $this->urls_model->get_by_profile();
 					
-					if($data['urls'] and isset($data['urls'])) {
+				if($data['urls'] and isset($data['urls'])) {
 					
 					foreach( $data['urls'] as $url_row ){
+					
+						$logs[] = array('item' => 'Adres URL', 'message' => $url_row->url);
 				
 						$adres = prep_url($url_row->url);
 						
@@ -39,7 +47,7 @@ class Crawler extends CI_Controller {
 						$result_page = curl_exec($c);
 						curl_close($c);
 						
-						foreach($tags as $tag_row){
+						/*foreach($tags as $tag_row){
 						
 							switch($tag_row->type){
 							
@@ -55,13 +63,13 @@ class Crawler extends CI_Controller {
 								// IF URL > DATABASE
 							// IF REST THEN MYSQL IT 
 						
-						}				
+						}			*/	
 					
 					}
 					
 				}
 		
-		}
+			}
 	
 		
 		$data = array();
@@ -69,6 +77,8 @@ class Crawler extends CI_Controller {
 		$data['userdata'] = $this->users->get_by_id();
 		
 		$data['tags'] = $this->tags_model->get();
+		$data['logs'] = $logs;
+		
 		
 		$this->load->view('crawler',$data);
 		
