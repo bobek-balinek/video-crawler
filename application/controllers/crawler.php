@@ -1,7 +1,7 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 
-class Crawler extends CI_Controller(){
+class Crawler extends CI_Controller {
 
 	function __construct(){
 		parent::__construct();
@@ -13,32 +13,54 @@ class Crawler extends CI_Controller(){
 	}
 	public function index(){
 	
+	$data = array();
+	
 		$data['profiles'] = $this->profiles_model->get();
 		
-		foreach( $data['profiles'] as $profile_row ){
+				foreach( $data['profiles'] as $profile_row ){
+				
+					$data['urls'] = $this->urls_model->get_by_profile();
+					
+					if($data['urls'] and isset($data['urls'])) {
+					
+					foreach( $data['urls'] as $url_row ){
+				
+						$adres = prep_url($url_row->url);
+						
+						$this->cookies_model->idProfiles = $profile_row->id;
+						$cookies = $this->cookies_model->get_by_profile(1);
+						
+						$this->tags_model->idProfiles = $profile_row->id;
+						$tags = $this->tags_model->get_by_profile();
+						
+						// LOAD PAGE INTO VAR WITH COOKIE
+						$c = curl_init($url_row->url);
+						curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+						$result_page = curl_exec($c);
+						curl_close($c);
+						
+						foreach($tags as $tag_row){
+						
+							switch($tag_row->type){
+							
+								case 'video' : break;
+								
+								case 'url' :  break;
+								
+								case 'desc' :  break;
+								
+								case 'title' :  break;			
+							
+							}
+								// IF URL > DATABASE
+							// IF REST THEN MYSQL IT 
+						
+						}				
+					
+					}
+					
+				}
 		
-			$data['urls'] = $this->urls_model->get_bt_profile();
-			
-			foreach( $data['url'] as $url_row ){
-		
-				$adres = prep_url($url_row->url);
-				
-				// IF COOKIE THEN COOKIE
-				
-				// GET TAGS 
-				
-				// LOAD PAGE INTO VAR WITH COOKIE
-				
-				// LOOP TAGS AND GET DATA
-					// IF URL > DATABASE
-					// IF REST THEN MYSQL IT 
-				
-				
-				
-			
-			
-			}
-			
 		}
 	
 		
@@ -48,7 +70,7 @@ class Crawler extends CI_Controller(){
 		
 		$data['tags'] = $this->tags_model->get();
 		
-		$this->load->view('tags',$data);
+		$this->load->view('crawler',$data);
 		
 	
 	

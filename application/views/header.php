@@ -21,6 +21,7 @@
 			<li><a href="<?=base_url()?>tags">Tagi</a></li>
 			<li><a href="<?=base_url()?>cookies">Ciasteczka</a></li>
 			<li><a href="<?=base_url()?>settings">Ustawienia</a></li>
+			<li><a href="<?=base_url()?>crawler">Uruchom</a></li>
 		</ul>
 
 		<div id="content" class="container_16 clearfix">
