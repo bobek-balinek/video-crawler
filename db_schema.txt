@@ -1,0 +1,26 @@
+Profiles
+
+	id
+	name
+	url
+	
+Urls
+	id
+	idProfiles
+	url
+	pattern
+
+Tags
+
+	id
+	idProfiles
+	text
+
+Cookies
+
+	id
+	idProfile
+	name	
+	agent
+	content
+	
