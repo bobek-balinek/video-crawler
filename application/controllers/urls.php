@@ -27,7 +27,7 @@ class Urls extends CI_Controller {
 		
 			$this->form_validation->set_rules('profile','Profil','required|trim|xss_clean');
 			$this->form_validation->set_rules('url','Adres URL','required|trim|xss_clean');
-			$this->form_validation->set_rules('text','text','required|trim|xss_clean');
+			//$this->form_validation->set_rules('text','text','required|trim|xss_clean');
 			
 			if ( $this->form_validation->run()==FALSE ){
 			

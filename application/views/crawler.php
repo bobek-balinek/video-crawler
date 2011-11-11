@@ -1,12 +1,13 @@
 <?php $this->load->view('header') ?>
 
 
+
 <h1>Skończono skanowanie.</h1>
 
 <?php if(isset($logs) and $logs){ ?>
 <ul>
 	<?php foreach ( $logs as $row ){ ?>
-	<li><b><?=$row['item']?></b> / <b><?=$row['message']?></b>  </li>
+	<li><b class="item"><?=$row['item']?></b> / <b class="message"><?=$row['message']?></b>  </li>
 	<?php } ?>
 </ul>
 <?php }else{ ?>

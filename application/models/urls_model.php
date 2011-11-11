@@ -38,11 +38,8 @@ class Urls_Model extends CI_Model {
 		$this->db->where('idProfiles',$this->idProfiles);
 		$query = $this->db->get('urls',$limit,$offset);
 	
-		if($query->num_rows() > 1){
+		if($query->num_rows() > 0){
 			return $query->result();
-		}
-		else if( $query->num_rows() == 1 ){
-			return $query->row();
 		}else{
 			return false;
 		}

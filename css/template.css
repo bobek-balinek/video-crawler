@@ -237,3 +237,12 @@ input[type="submit"], input[type="reset"] {
 	font-size: 12pt;
 	font-weight: bold;
 }
+
+
+.item{
+	color: red;
+	font-weight: bold;
+}
+.message{
+	color: grey;
+}

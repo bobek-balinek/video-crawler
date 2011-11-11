@@ -42,8 +42,7 @@ class Tags_Model extends CI_Model {
 		$query = $this->db->get('tags',$limit,$offset);
 	
 		if( $query->num_rows() > 0 ){
-			
-			return $query->row();
+			return $query->result();
 		}else{
 			return false;
 		}

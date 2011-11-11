@@ -1,6 +1,5 @@
-<?php $this->load->view('header') ?>
+<?php $this->load->view('header'); ?>
 
-<!-- ADD NEW -->
 
 <?php if(isset($message)){ echo $message; } ?>
 <?=form_open('tags/add'); ?>
@@ -37,6 +36,7 @@
 			<option value="url">Adres URL</option>
 			<option value="video">Wideo</option>
 			<option value="desc">Opis</option>
+			<option value="img">Obraz</option>
 			<option value="title">Tytuł</option>
 		</select>
 	</p>
@@ -63,7 +63,7 @@
 	?>
 	<tr>
 		<td><?=$row->profile_name?></td>
-		<td><?=$row->text?></td>
+		<td><?=htmlspecialchars($row->text)?></td>
 		<td><?=$row->type?></td>
 		<td><a href="<?=base_url()?>tags/edit/<?=$row->id?>" class="edit">Edytuj</a></td>
 		<td><a href="<?=base_url()?>tags/delete/<?=$row->id?>" class="edit">Usuń</a></td>
