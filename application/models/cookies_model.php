@@ -39,11 +39,11 @@ class Cookies_Model extends CI_Model {
 	function get_by_profile($limit = null, $offset = null){
 	
 		$this->db->where('idProfiles',$this->idProfiles);
-		$query = $this->db->get('cookies',$limit,$offset);
+		$query = $this->db->get('cookies',1);
 	
-		if( $query->num_rows() > 0 ){
+		if( $query->num_rows() ==1 ){
 			
-			return $query->result();
+			return $query->row();
 		}else{
 			return false;
 		}

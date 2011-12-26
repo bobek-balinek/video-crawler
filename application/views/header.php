@@ -8,6 +8,7 @@
 		<link rel="stylesheet" href="<?=base_url()?>css/960/text.css" type="text/css" media="screen" charset="utf-8" />
 		<link rel="stylesheet" href="<?=base_url()?>css/template.css" type="text/css" media="screen" charset="utf-8" />
 		<link rel="stylesheet" href="<?=base_url()?>css/colour.css" type="text/css" media="screen" charset="utf-8" />
+		<script type="text/javascript" src="<?=base_url()?>js/paging.js"></script>
 	</head>
 	<body>
 

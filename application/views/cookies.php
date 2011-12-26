@@ -53,7 +53,7 @@
 </div>
 <?=form_close()?>
 
-<table class="grid_16">
+<table id="results" class="grid_16">
 	<thead>
 		<th width="20%">Nazwa Profilu</th>
 		<th width="30%">Nazwa</th>
@@ -82,5 +82,6 @@
 	}?>
 	</tbody>
 </table>
+<div class="grid_16" id="pageNavPosition"></div>
 
 <?php $this->load->view('footer') ?>

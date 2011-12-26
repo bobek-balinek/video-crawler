@@ -37,6 +37,7 @@
 		<select name="type" id="type">
 			<option value="url" <?php if($tag->type=='url') echo 'selected' ?>>Adres URL</option>
 			<option value="video" <?php if($tag->type=='video') echo 'selected' ?>>Wideo</option>
+			<option value="category"<?php if($tag->type=='category') echo 'selected' ?> >Kategoria</option>
 			<option value="desc"<?php if($tag->type=='desc') echo 'selected' ?> >Opis</option>
 			<option value="img"<?php if($tag->type=='img') echo 'selected' ?> >Obraz</option>
 			<option value="title"<?php if($tag->type=='title') echo 'selected' ?> >Tytuł</option>

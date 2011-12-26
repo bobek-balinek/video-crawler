@@ -7,5 +7,11 @@
 				</div>
 			</div>
 		</div>
+		<script type="text/javascript"><!--
+		var pager = new Pager('results', 25); 
+		pager.init(); 
+		pager.showPageNav('pager', 'pageNavPosition'); 
+		pager.showPage(1);
+//--></script>
 	</body>
 </html>

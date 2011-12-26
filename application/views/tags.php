@@ -35,6 +35,7 @@
 		<select name="type" id="type">
 			<option value="url">Adres URL</option>
 			<option value="video">Wideo</option>
+			<option value="category">Kategoria</option>
 			<option value="desc">Opis</option>
 			<option value="img">Obraz</option>
 			<option value="title">Tytuł</option>
@@ -50,7 +51,7 @@
 </div>
 <?=form_close()?>
 
-<table class="grid_16">
+<table id="results" class="grid_16">
 	<thead>
 		<th width="20%">Nazwa Profilu</th>
 		<th width="40%">Text</th>
@@ -77,5 +78,6 @@
 	}?>
 	</tbody>
 </table>
+<div class="grid_16" id="pageNavPosition"></div>
 
 <?php $this->load->view('footer') ?>
