@@ -44,6 +44,13 @@ class Sign_in extends CI_Controller {
 		
 		$this->load->view('sign_in',$data);
 	}
+	
+	function sign_out(){
+	
+		$this->session->sess_destroy();
+		redirect('/');
+	
+	}
 }
 
 /* End of file home.php */

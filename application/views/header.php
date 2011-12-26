@@ -13,7 +13,7 @@
 	<body>
 
 		<h1 id="head">Panel Administratora 
-			<?php if( isset($userdata) and $userdata ){ ?><span class="user">Zalogowany jako: <?=$userdata->name ?> <a href="<?=base_url() ?>admin/wyloguj">Wyloguj</a></span><?php } ?></h1>
+			<?php if( isset($userdata) and $userdata ){ ?><span class="user">Zalogowany jako: <?=$userdata->name ?> <a href="<?=base_url() ?>sign_in/sign_out">Wyloguj</a></span><?php } ?></h1>
 		
 		<ul id="navigation">
 			<li><a href="<?=base_url()?>">Podgląd</a></li>

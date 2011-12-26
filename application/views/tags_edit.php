@@ -15,7 +15,7 @@
 		<?php if($profiles){ ?>
 		<select name="profile" id="profile">
 			<?php foreach($profiles as $row){ ?>
-			<option value="<?=$row->id?>" <?php if($tag->idProfiles = $row->id){ echo 'selected'; }?> ><?=$row->name?></option>
+			<option value="<?=$row->id?>" <?php if($tag->idProfiles == $row->id){ echo 'selected="selected"'; }?> ><?=$row->name?></option>
 			<?php } ?>
 		</select>
 		<?php }else{ ?>

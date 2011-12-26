@@ -16,7 +16,7 @@ class Crawler extends CI_Controller {
 		$this->load->model('tags_model');
 		$this->load->model('cookies_model');
 		$this->load->model('logs_model');
-		$this->output->enable_profiler(TRUE);
+		$this->output->enable_profiler(FALSE);
 	}
 
 	
@@ -313,22 +313,47 @@ class Crawler extends CI_Controller {
 									preg_match($tag_text, $result_page, $base_video);
 									//print_r($base_video)."\n";
 									if(isset($base_video) and $base_video and $base_video[1]<>''){
-										$video = $base_video[1];
-										
-										//$video = substr(parse_url($videos, PHP_URL_PATH), 3, 8);
-										$this->logs_model->add( 'Video' ,   'Znaleziono i dodano wideo.');
-										
+									
+										if( $video == ''){
+								
+												$code = $base_video[1];
+												$poss = strpos($tag_text, 'videobb');
+												
+												if($poss===false){
+													$por = strpos($tag_text, 'videozer');
+													
+													if($por===false){
+													
+														//$video = $code;
+														$video = substr(parse_url($code, PHP_URL_PATH), 0, 8);
+													}else{
+														$video = 'vz:'.$code;
+													}
+												}else{
+													$video = 'bb:'.$code;
+												}
+												
+												$this->logs_model->add( 'Video' ,   'Znaleziono i dodano wideo.');
+												
+										}else{
+											$video ='';
+											$this->logs_model->add( 'Video' ,   'Brak wideo.');
+										}
 									
 									}else{
-										$video ='';
-										$this->logs_model->add( 'Video' ,   'Brak wideo.');
+										if(!isset($video) or $video==''){
+											$video = '';
+											$this->logs_model->add( 'Video' ,   'Brak wideo.');
+										}
 									}
 								break;
 								
 								case 'desc' :
 									preg_match($tag_text, $result_page, $base_desc);
 									if(isset($base_desc) and $base_desc and $base_desc[1]<>''){
-										$desc = $base_desc[1];
+										$this->load->helper('string');
+										
+										$desc = strip_quotes($base_desc[1]);
 										//print_r($base_desc);
 										$this->logs_model->add( 'Opis' ,   'Znaleziono i dodano opis.');
 									}else{
@@ -403,52 +428,48 @@ class Crawler extends CI_Controller {
 						}
 						
 						unset($result_page);
+						//echo $video.'a';
+						if(isset($video) and $video<>''){
+							$dats = date('YmdHis');
+							if(!isset($img)){
+								$img = ' ';
+							}
+							
+							if(!isset($category)){
+								$category = '';
+							}
+							$xfileds = 'image|'.$img.'||jakosc|Dobra||jezyk|Brak Danych||rok|Brak Danych';			
+							
+							$this->db->where('full_story',$video);
+							$this->db->or_where('title', $title);
+							$qury = $this->db->get('dle_post',1);
+								if($qury->num_rows()==0){
+
+								
+									$alt_title=strtr($title,"ĄĆĘŁŃÓŚŻŹąćęłńóśżź","acelnoszzacelnoszz");
+									//$txt=strtr($txt,"ˇĆĘŁŃÓ¦Ż¬±ćęłńó¶żĽ","acelnoszzacelnoszz");
+									$alt_title = str_replace(" ", "_", $alt_title);
+		
+									$sql = "INSERT INTO dle_post SET autor='".$autor[rand(1, 10)]."', category='".$category."',  date='".$dats."',
+											title='".$title."', alt_name='".url_title($alt_title)."', short_story='".$desc."', full_story='".$video."', xfields='".$xfileds."', comm_num='0', allow_comm='1',  allow_main='1', allow_rate='1',  approve='1',  fixed='0',
+											rating='0',  access='', allow_br='1',  vote_num='0',  	editdate='',  news_read='".rand(1, 80)."', votes='0',  view_edit='0',  flag='1' ";
 						
-				if(isset($video) and $video<>''){
-					$dats = date('YmdHis');
-					if(!isset($img)){
-						$img = ' ';
-					}
-					$xfileds = 'image|'.$img.'||jakosc|Dobra||jezyk|Brak Danych||rok|Brak Danych';			
-					
-					$this->db->where('full_story',$video);
-					$qury = $this->db->get('dle_post',1);
-					
-						if($qury->num_rows()==0){
-							$sql = "INSERT INTO dle_post SET 
-									autor='".$autor[rand(1, 10)]."',
-									category='".$category."', 
-									date='".$dats."',
-									title='".$title."',
-									alt_name='".url_title($title)."',
-									short_story='".$desc."',
-									full_story='".$video."',
-									xfields='".$xfileds."',
-									comm_num='0',
-									allow_comm='1', 
-									allow_main='1',
-									allow_rate='1', 
-									approve='1', 
-									fixed='0',
-									rating='0', 
-									access='',
-									allow_br='1', 
-									vote_num='0', 
-									editdate='', 
-									news_read='".rand(1, 80)."',
-									votes='0', 
-									view_edit='0', 
-									flag='1'
-									";
-				
-							$this->db->query($sql);
-							$this->logs_model->add( 'Film' ,   'Zapisano film w bazie danych.');
-						}else{
-							$this->logs_model->add( 'Film' ,   'Film już istnieje w bazie danych.');
+									$this->db->query($sql);
+									
+									$this->logs_model->add( 'Film' ,   'Zapisano film w bazie danych.');
+									$this->db->where('id',$url_row->id);
+									$this->db->delete('urls');
+									
+								}else{
+								
+									$this->logs_model->add( 'Film' ,   'Film już istnieje w bazie danych.');
+									
+									$this->db->where('id',$url_row->id);
+									$this->db->delete('urls');
+								}
+						
 						}
-				
-				}
-					
+						// End foreach url_row
 					}
 					
 				}else{
@@ -475,6 +496,7 @@ class Crawler extends CI_Controller {
 				print($key.'. '.$value['item'].' > '.$value['message'].PHP_EOL);
 				
 			}
+			//print PHP_EOL;
 			
 		}else{
 		
