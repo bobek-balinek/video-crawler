@@ -334,11 +334,7 @@ class Crawler extends CI_Controller {
 												}
 												
 												$this->logs_model->add( 'Video' ,   'Znaleziono i dodano wideo.');
-												
-										}else{
-											$video ='';
-											$this->logs_model->add( 'Video' ,   'Brak wideo.');
-										}
+											}
 									
 									}else{
 										if(!isset($video) or $video==''){
@@ -440,9 +436,10 @@ class Crawler extends CI_Controller {
 							}
 							$xfileds = 'image|'.$img.'||jakosc|Dobra||jezyk|Brak Danych||rok|Brak Danych';			
 							
-							$this->db->where('full_story',$video);
-							$this->db->or_where('title', $title);
+							//$this->db->where('full_story',$video);
+							$this->db->where('title', $title);
 							$qury = $this->db->get('dle_post',1);
+							
 								if($qury->num_rows()==0){
 
 								
@@ -462,7 +459,17 @@ class Crawler extends CI_Controller {
 									
 								}else{
 								
-									$this->logs_model->add( 'Film' ,   'Film już istnieje w bazie danych.');
+									$this->logs_model->add( 'Film' ,   'Film już istnieje w bazie danych. Został nadpisany.');
+									
+									$datas = array(
+										//'category' => $category,
+										'full_story' => $video,
+										'date' => $dats,
+										'news_read' => rand(1, 80),
+									);
+									
+									$this->db->or_where('title', $title);
+									$this->db->update('dle_post',$datas);
 									
 									$this->db->where('id',$url_row->id);
 									$this->db->delete('urls');
