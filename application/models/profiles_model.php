@@ -40,7 +40,7 @@ class Profiles_Model extends CI_Model {
 	
 		if( $query->num_rows() == 1 ){
 			
-			return $query->result();
+			return $query->row();
 		}else{
 			return false;
 		}

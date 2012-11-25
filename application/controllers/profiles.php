@@ -7,6 +7,7 @@ class Profiles extends CI_Controller {
 		$this->users->valid_login();
 		$this->load->model('profiles_model');
 	}
+	
 	public function index(){
 		
 		
@@ -75,7 +76,7 @@ class Profiles extends CI_Controller {
 			}
 
 			$data['profile'] = $this->profiles_model->get_by_id();
-			$data['profiles'] = $this->profiles_model->get();
+			//$data['profiles'] = $this->profiles_model->get();
 		
 			$this->load->view('profiles_edit',$data);
 		}else{

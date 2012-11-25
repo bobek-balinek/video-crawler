@@ -56,7 +56,144 @@ class Crawler extends CI_Controller {
 			
 			if(isset($id) and $id){
 				$this->profiles_model->id = $id;
-				$data['profiles'] = $this->profiles_model->get_by_id();
+				$data['profiles'][] = $this->profiles_model->get_by_id();
+			}else{
+				$data['profiles'] = $this->profiles_model->get();
+			}
+		
+			foreach( $data['profiles'] as $profile_row ){
+			
+				$this->logs_model->add(  'Profil: '.$profile_row->name ,   'Otworzono profil');
+				
+				// Profiles linking
+				//
+				$this->urls_model->idProfiles = $profile_row->id;
+				$this->cookies_model->idProfiles = $profile_row->id;
+				$this->tags_model->idProfiles = $profile_row->id;
+				
+				
+				// Get data according to profile
+				//
+				$data['urls'] = $this->urls_model->get_by_profile();
+				$cookies = $this->cookies_model->get_by_profile(1);
+				$tags = $this->tags_model->get_by_profile();
+				
+				// /src=[\"']?([^www.megavideo.com/v/?.*])[\"']/i
+				///href=[\'"]?[^www.megavideo.com$]([^\'" >]+)[\'" >]/
+				// /src=[\"']?([^\"']?.*(png|jpg|gif))[\"']/i
+				//  src="http://www.megavideo.com/v/N6EL9OXV"
+				// Each url > parse it with tags' patterns	
+				if(isset($data['urls']) and $data['urls']) {
+					
+					foreach( $data['urls'] as $url_row ){
+				
+						$urla = $url_row->url;
+						
+						if(  startsWith($urla,'/') ){
+							$urla = $profile_row->url . $urla;
+						}
+						$adres = prep_url($urla);
+						
+						// LOAD PAGE INTO VAR WITH COOKIE
+						$c = curl_init($adres);
+						curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+						//curl_setopt($c, CURLOPT_COOKIE, $cookie);9im
+						//curl_setopt($c, CURLOPT_HEADER, TRUE);
+						curl_setopt($c, CURLOPT_USERAGENT, 'Googlebot/2.1 (+http://www.googlebot.com/bot.html)');
+						$result_page = curl_exec($c);
+						curl_close($c);
+						//echo $result_page;
+
+						$this->logs_model->add(  'Adres URL',   $urla);
+						
+
+						foreach($tags as $tag_row){
+						
+							//$tag_text = addslashes( str_replace('(:any)', '(.*)' ,$tag_row->text) );
+							$tag_text = $tag_row->text;
+							switch($tag_row->type){
+								
+								case 'url' :  
+								
+									preg_match_all($tag_text, $result_page, $base);
+									//[0] = "ALL"
+									// [1] = " CONENT ( VAR 1 )"
+									$bas = $base[1];
+									//print_r($bas);
+									foreach($bas as $row){
+										if(isset($row) and $row<>'' and $row<>'#' and $row<>'/'){
+									
+												$this->urls_model->id = '';
+												$this->urls_model->idProfiles = $profile_row->id;
+												$this->urls_model->url = $row;
+												$this->urls_model->text = $row;
+												$this->urls_model->save();
+												
+												//print_r(htmlspecialchars($row));
+												$this->logs_model->add( 'Adres URL' ,   'Dodany nowy adres URL.');
+												//unset($base);
+										}else{
+											$this->logs_model->add( 'Adres URL' ,   'Nie znaleziono adresu URL');
+										}
+									}
+									break;
+							
+							}
+
+						}
+						
+						unset($result_page);
+					
+					}
+					
+				}else{
+				
+					$this->logs_model->add( 'Adres URL' ,   'Brak adresów URL');
+				
+				}
+		
+			}
+		
+			$this->benchmark->mark('code_end');
+			$lol = $this->benchmark->elapsed_time('code_start', 'code_end');
+			$this->logs_model->time_elapsed = $lol; 
+			$this->logs_model->mode = 'Adresy URL'; 
+			$this->logs_model->add('Skrypt', 'Skrypt zakończył działanie w czasie:'.$lol.'s');
+			
+			$data['logs'] = $this->logs_model->get();
+			$this->logs_model->save();
+			
+			if($this->input->is_cli_request() == TRUE){
+			
+				foreach($data['logs'] as $key => $value){
+				
+					print($key.'. '.$value['item'].' > '.$value['message'].PHP_EOL);
+					
+				}
+				
+			}else{
+			
+				$this->users->id = $this->session->userdata('id');
+				$data['userdata'] = $this->users->get_by_id();
+				$this->load->view('crawler',$data);
+			
+			}
+			
+	}
+
+	public function categories($id = null) {
+	
+		// Setting null arrays
+		$data = array();
+		$logs = array();
+	
+			$this->benchmark->mark('code_start');
+			// Get profiles
+			$this->logs_model->add( 'Skrypt',  'Uruchomiono skrypt');
+			
+			if(isset($id) and $id){
+				$this->profiles_model->id = $id;
+				$data['profiles'][] = $this->profiles_model->get_by_id();
 			}else{
 				$data['profiles'] = $this->profiles_model->get();
 			}
@@ -222,7 +359,7 @@ class Crawler extends CI_Controller {
 		if($id and isset($id)){
 		
 			$this->profiles_model->id = $id;
-			$data['profiles'] = $this->profiles_model->get_by_id();
+			$data['profiles'][] = $this->profiles_model->get_by_id();
 			
 		}else{
 		
@@ -386,7 +523,36 @@ class Crawler extends CI_Controller {
 								
 								case 'category' :
 									// Compare each category 
-									preg_match($tag_text, $result_page, $base_cat);
+
+									preg_match_all($tag_text, $result_page, $base_cat);
+
+									if(isset($base_cat) and $base_cat[1]){
+										
+										$cate = array();
+										print_r($base_cat[1]);
+										foreach($base_cat[1] as $key){
+											
+
+											//echo($key);
+											$this->db->select('id');
+											$this->db->like('name' , trim($key));
+											$ol = $this->db->get('dle_category');
+											//print_r($ol->row());
+											if($ol->num_rows()>0){
+											
+												$kf = $ol->row();
+												array_push($cate,$kf->id);
+											
+											}else{
+											
+											}
+										}
+										$category = implode(",",$cate);
+										print_r($cate);
+										$this->logs_model->add( 'Kategoria',   'znaleziono i dodano kategorie.');
+									
+
+								/*	preg_match_all($tag_text, $result_page, $base_cat);
 									if(isset($base_cat) and $base_cat){
 																		
 										$catsy = explode("," , $base_cat[1]);
@@ -409,9 +575,9 @@ class Crawler extends CI_Controller {
 											}
 										}
 										
-										$category = implode(",",$gard);
+										$category = implode(",",$gard); */
 										//print_r($category);
-										$this->logs_model->add( 'Kategoria',   'znaleziono i dodano kategorie.');
+										
 									
 									}else{
 										$category = '';
@@ -435,13 +601,13 @@ class Crawler extends CI_Controller {
 								$category = '';
 							}
 							$xfileds = 'image|'.$img.'||jakosc|Dobra||jezyk|Brak Danych||rok|Brak Danych';			
-							
+echo" as";							
 							//$this->db->where('full_story',$video);
 							$this->db->where('title', $title);
 							$qury = $this->db->get('dle_post',1);
 							
 								if($qury->num_rows()==0){
-
+echo" ss";
 								
 									$alt_title=strtr($title,"ĄĆĘŁŃÓŚŻŹąćęłńóśżź","acelnoszzacelnoszz");
 									//$txt=strtr($txt,"ˇĆĘŁŃÓ¦Ż¬±ćęłńó¶żĽ","acelnoszzacelnoszz");
@@ -450,7 +616,13 @@ class Crawler extends CI_Controller {
 									$sql = "INSERT INTO dle_post SET autor='".$autor[rand(1, 10)]."', category='".$category."',  date='".$dats."',
 											title='".$title."', alt_name='".url_title($alt_title)."', short_story='".$desc."', full_story='".$video."', xfields='".$xfileds."', comm_num='0', allow_comm='1',  allow_main='1', allow_rate='1',  approve='1',  fixed='0',
 											rating='0',  access='', allow_br='1',  vote_num='0',  	editdate='',  news_read='".rand(1, 80)."', votes='0',  view_edit='0',  flag='1' ";
-						
+									unset($video);
+									unset($img);
+									unset($desc);
+									unset($category);
+									unset($title);
+									unset($alt_title);
+									
 									$this->db->query($sql);
 									
 									$this->logs_model->add( 'Film' ,   'Zapisano film w bazie danych.');
@@ -470,6 +642,13 @@ class Crawler extends CI_Controller {
 									
 									$this->db->or_where('title', $title);
 									$this->db->update('dle_post',$datas);
+									
+									unset($video);
+									unset($img);
+									unset($desc);
+									unset($category);
+									unset($title);
+									unset($alt_title);
 									
 									$this->db->where('id',$url_row->id);
 									$this->db->delete('urls');
